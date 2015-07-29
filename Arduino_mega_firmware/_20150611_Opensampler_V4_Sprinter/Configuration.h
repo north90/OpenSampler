@@ -10,8 +10,8 @@ long timeout_time_for_fan_pin=60;
 // at 1/16 microsteps: 25*8=200 usteps per mm IN THEORY.. 
 //in practice the X-Axis TR8 aint quite 8
 // so 400mm turns out to be 403 (1% off!) So 198.5 steps per mm
-//float axis_steps_per_unit[] = {198.5, 200, 200, 200}; 
-float axis_steps_per_unit[] = {80, 80, 400, 200}; 
+//float axis_steps_per_unit[] = {80, 80, 400, 200}; 
+float axis_steps_per_unit[] = {160, 160, 800, 200}; 
 
 //// Endstop Settings
 #define ENDSTOPPULLUPS // Comment this out (using // at the start of the line) to disable the endstop pullup resistors
@@ -53,9 +53,9 @@ const bool INVERT_E_DIR = false;
 
 const bool min_software_endstops = false; //If true, axis won't move to coordinates less than zero.
 const bool max_software_endstops = true;  //If true, axis won't move to coordinates greater than the defined lengths below.
-const int X_MAX_LENGTH = 355;
-const int Y_MAX_LENGTH = 175;
-const int Z_MAX_LENGTH = 80;
+const int X_MAX_LENGTH = 322;
+const int Y_MAX_LENGTH = 140;
+const int Z_MAX_LENGTH = 100;
 
 //// MOVEMENT SETTINGS
 const int NUM_AXIS = 4; // The axis order in all axis related arrays is X, Y, Z, E
