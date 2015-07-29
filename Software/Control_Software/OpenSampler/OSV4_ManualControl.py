@@ -9,7 +9,7 @@
 
 # COMMUNICATION SETTINGS
 # comport to which the OpenSampler is attached (1)
-comport_opensampler=10
+comport_opensampler=5
 
 # baudrate to OpenSampler (115200)
 baudrate_opensampler=115200

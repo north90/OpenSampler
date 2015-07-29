@@ -21,9 +21,13 @@ ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
 class Settings():
     # time  (minutes) that each port is sampled (8)
-    samplingMinutes=0.1
+    samplingMinutes=10
+    # time  (seconds to flush analyzer with UZ Air before new sample) (150)
+    preFlushSeconds=150
+    # time  (seconds to flush analyzer with lab Air after each sample) (90)
+    postFlushSeconds=90
     # COMMUNICATION SETTINGS (look in Control Panel and look for Arduino Mega)
-    comPortOpenSampler=10
+    comPortOpenSampler=5
     # baudrate to OpenSampler (11500)
     baudRateOpenSampler=115200
     # amount sample positions 
@@ -34,7 +38,7 @@ class Settings():
     ymm=[0.3,0.3,0.3,0.3,0.3,19.3,19.3,19.3,19.3,19.3,38.3,38.3,38.3,38.3,38.3,57.3,57.3,57.3,57.3,57.3,76.3,76.3,76.3,76.3,76.3,95.3,95.3,95.3,95.3,95.3,114.3,114.3,114.3,114.3,114.3,133.3,133.3,133.3,133.3,133.3,0.3,0.3,0.3,0.3,0.3,19.3,19.3,19.3,19.3,19.3,38.3,38.3,38.3,38.3,38.3,57.3,57.3,57.3,57.3,57.3,76.3,76.3,76.3,76.3,76.3,95.3,95.3,95.3,95.3,95.3,114.3,114.3,114.3,114.3,114.3,133.3,133.3,133.3,133.3,133.3,0.3,0.3,0.3,0.3,0.3,19.3,19.3,19.3,19.3,19.3,38.3,38.3,38.3,38.3,38.3,57.3,57.3,57.3,57.3,57.3,76.3,76.3,76.3,76.3,76.3,95.3,95.3,95.3,95.3,95.3,114.3,114.3,114.3,114.3,114.3,133.3,133.3,133.3,133.3,133.3]
 
     # down movement to get correct needle penetration
-    needleDepth=25;
+    needleDepth=28;
     # how far to lift up needle for moves (0 is all the way up)
     zUp=0
     # how often to send commands to keep valves in current position (55)
@@ -85,7 +89,7 @@ def sampleRoutine():
         GoPosition(position)
         FlushingOn()
         setGreenLabel("Running:Pre-Flush N2 #" + str(samplenumber) )
-        waitseconds(3)
+        waitseconds(Settings.preFlushSeconds)
 
     elif (Automation.sampleRoutineStep==2):
         print "Automation.sampleRoutineStep 2"
@@ -99,7 +103,7 @@ def sampleRoutine():
         print "Automation.sampleRoutineStep 3"
         GoZ(0.0)
         setGreenLabel("Running(Post-Flush) #" + str(samplenumber))
-        waitseconds(3)
+        waitseconds(Settings.postFlushSeconds)
 
     elif (Automation.sampleRoutineStep==4):
         print "Automation.sampleRoutineStep 4"
@@ -155,25 +159,27 @@ def stopAutomationNow():
   
 
 def keepAnEyeOnTime(): 
-    # if sampling
-    if Automation.isRunning :
-        if (time.time()-Automation.waitTimeStarted > Automation.waitTimeSeconds):
-            if (Automation.sampleRoutineStep<99):
-                Automation.sampleRoutineStep=Automation.sampleRoutineStep+1
-            sampleRoutine()
+    try:
+        # if sampling
+        if Automation.isRunning :
+            if (time.time()-Automation.waitTimeStarted > Automation.waitTimeSeconds):
+                if (Automation.sampleRoutineStep<99):
+                    Automation.sampleRoutineStep=Automation.sampleRoutineStep+1
+                sampleRoutine()
+            else:
+                secondswaited=time.time()-Automation.waitTimeStarted
+                controllerGui.statusBar().showMessage("waited "+ str(int(secondswaited)) + " out of " + str(Automation.waitTimeSeconds) + "sec")
+        # if the stop button is pressed
         else:
-            secondswaited=time.time()-Automation.waitTimeStarted
-            controllerGui.statusBar().showMessage("waited "+ str(int(secondswaited)) + " out of " + str(Automation.waitTimeSeconds) + "sec")
-    # if the stop button is pressed
-    else:
-        return
-          
-    # solenoid valves switch off automatically after 1 minute, so send them an update sooner than that (55seconds)
-    if (time.time()-Automation.timeLastSolenoidRefresh > Settings.solenoidRefreshTime):
-        print "time for solenoid refresh"
-        refreshsolenoids()
-    # do this every 250ms as long as automation is running
-    QtCore.QTimer.singleShot(250, keepAnEyeOnTime)  
+            return
+              
+        # solenoid valves switch off automatically after 1 minute, so send them an update sooner than that (55seconds)
+        if (time.time()-Automation.timeLastSolenoidRefresh > Settings.solenoidRefreshTime):
+            print "time for solenoid refresh"
+            refreshsolenoids()
+    finally:
+        # do this every 250ms as long as automation is running
+        QtCore.QTimer.singleShot(500, keepAnEyeOnTime) 
 
 def waitseconds(waitseconds):
    Automation.waitTimeStarted=time.time()
@@ -291,6 +297,7 @@ def savetologfile():
 class SampleTableModel(QtCore.QAbstractTableModel):
     def __init__(self, samples = [[]], headers = [], parent = None):
         QtCore.QAbstractTableModel.__init__(self, parent)
+        # ___samples stores all values as normal python String
         self.__samples = samples
         self.__headers = headers
         
@@ -334,10 +341,18 @@ class SampleTableModel(QtCore.QAbstractTableModel):
                 if tempvalue > Settings.amountPositions or tempvalue < 1:
                     return False
                 else:
+                    try:
+                        tempvalue=tempvalue.toString()
+                    except:
+                        print "tempvalue.toString did not work"
                     self.__samples[row][column] = tempvalue
                     self.dataChanged.emit (index, index)
                     return True
             elif column == 1:
+                try:
+                    value=value.toString()
+                except:
+                    print "value.toString did not work"
                 self.__samples[row][column] = value
                 self.dataChanged.emit (index, index)
                 return True
@@ -357,8 +372,8 @@ class SampleTableModel(QtCore.QAbstractTableModel):
     def setDataRow(self,row,values):
         if row > len(self.__samples) -1 :
             self.insertRows(row,1)
-        self.__samples[row][0] = QtCore.QString(str(values[0]))
-        self.__samples[row][1] = QtCore.QString(values[1])
+        self.__samples[row][0] =str(values[0])
+        self.__samples[row][1] =str(values[1])
         self.dataChanged.emit (self.index(row,0), self.index(row,1))
             
     def setRowCount(self, rows, parent = QtCore.QModelIndex()):
@@ -370,9 +385,10 @@ class SampleTableModel(QtCore.QAbstractTableModel):
 
     def insertRows(self, position, rows, parent = QtCore.QModelIndex()):
         self.beginInsertRows(parent, position, position + rows - 1)
-        emptyline=["1","sample","","not done"]
         for i in range(rows):
+            emptyline=["2","sample3","","not done"]
             self.__samples.insert(position, emptyline )
+            self.setDataRow(position,["1","sample"])
         self.endInsertRows()
         
     def removeRows(self,position, rows, parent = QtCore.QModelIndex()):
