@@ -8,8 +8,8 @@
 #----------------------------------------------------------------------------
 
 # COMMUNICATION SETTINGS
-# comport to which the OpenSampler is attached (1)
-comport_opensampler=5
+# comport to which the OpenSampler is attached (1) look this up in "device manager" look for Arduino  Mega
+comport_opensampler=13
 
 # baudrate to OpenSampler (115200)
 baudrate_opensampler=115200
@@ -17,10 +17,16 @@ baudrate_opensampler=115200
 # amount sample positions
 amount_positions=120
 
-# X positions in mm
-xmm=[26,45,64,83,102,26,45,64,83,102,26,45,64,83,102,26,45,64,83,102,26,45,64,83,102,26,45,64,83,102,26,45,64,83,102,26,45,64,83,102,135,154,173,192,211,135,154,173,192,211,135,154,173,192,211,135,154,173,192,211,135,154,173,192,211,135,154,173,192,211,135,154,173,192,211,135,154,173,192,211,244,263,282,301,320,244,263,282,301,320,244,263,282,301,320,244,263,282,301,320,244,263,282,301,320,244,263,282,301,320,244,263,282,301,320,244,263,282,301,320]
-# Y positions in mm
-ymm=[0.3,0.3,0.3,0.3,0.3,19.3,19.3,19.3,19.3,19.3,38.3,38.3,38.3,38.3,38.3,57.3,57.3,57.3,57.3,57.3,76.3,76.3,76.3,76.3,76.3,95.3,95.3,95.3,95.3,95.3,114.3,114.3,114.3,114.3,114.3,133.3,133.3,133.3,133.3,133.3,0.3,0.3,0.3,0.3,0.3,19.3,19.3,19.3,19.3,19.3,38.3,38.3,38.3,38.3,38.3,57.3,57.3,57.3,57.3,57.3,76.3,76.3,76.3,76.3,76.3,95.3,95.3,95.3,95.3,95.3,114.3,114.3,114.3,114.3,114.3,133.3,133.3,133.3,133.3,133.3,0.3,0.3,0.3,0.3,0.3,19.3,19.3,19.3,19.3,19.3,38.3,38.3,38.3,38.3,38.3,57.3,57.3,57.3,57.3,57.3,76.3,76.3,76.3,76.3,76.3,95.3,95.3,95.3,95.3,95.3,114.3,114.3,114.3,114.3,114.3,133.3,133.3,133.3,133.3,133.3]
+# x position of first tube
+xoffset=24.0
+# y position of first tube
+yoffset=0.5
+
+# X positions in mm, measured from xhome+xoffset (=x position of first tube)
+xmm=[0,19,38,57,76,0,19,38,57,76,0,19,38,57,76,0,19,38,57,76,0,19,38,57,76,0,19,38,57,76,0,19,38,57,76,0,19,38,57,76,109,128,147,166,185,109,128,147,166,185,109,128,147,166,185,109,128,147,166,185,109,128,147,166,185,109,128,147,166,185,109,128,147,166,185,109,128,147,166,185,218,237,256,275,294,218,237,256,275,294,218,237,256,275,294,218,237,256,275,294,218,237,256,275,294,218,237,256,275,294,218,237,256,275,294,218,237,256,275,294]
+# Y positions in mm, measured from yhome+yoffset (=y position of first tube)
+ymm=[0,0,0,0,0,19,19,19,19,19,38,38,38,38,38,57,57,57,57,57,76,76,76,76,76,95,95,95,95,95,114,114,114,114,114,133,133,133,133,133,0,0,0,0,0,19,19,19,19,19,38,38,38,38,38,57,57,57,57,57,76,76,76,76,76,95,95,95,95,95,114,114,114,114,114,133,133,133,133,133,0,0,0,0,0,19,19,19,19,19,38,38,38,38,38,57,57,57,57,57,76,76,76,76,76,95,95,95,95,95,114,114,114,114,114,133,133,133,133,133]
+
 
 zUp=0
 zDown=30
@@ -55,7 +61,7 @@ import array
 
 # create a root TkInter frame
 root = Tk()
-root.title('Manual OpenSampler controller v20140813')
+root.title('Manual OpenSampler controller v20151006')
 
 comerror=0
 OpenSamplerSer = serial.Serial(comport_opensampler-1, baudrate_opensampler, timeout=2)  
@@ -66,15 +72,12 @@ time.sleep(2)
 #-----------------------------------------------------------------------------------------
 #____________________________ VARIABLES_______________________________________________
 #--------------------------------------------------------------------------------------
-
 ishomed=0
-
 
 #---------------------------------------------------------------------------------------------
 #____________________ MAIN routine______________________________________________________________
 #----------------------------------------------------------------------------------------------
 # isn't there because this is manual control
-
 
 #---------------------------------------------------------------------------------------------
 #____________________ Sub routines______________________________________________________________
@@ -98,7 +101,7 @@ def GoPosition():
    gotopos=int(sampleposentry.get())
    if (gotopos > 0 and gotopos < amount_positions+1 ):
       GoZ(zUp)
-      GoXYZ(xmm[gotopos-1],ymm[gotopos-1],zUp)
+      GoXYZ(xoffset+xmm[gotopos-1],yoffset+ymm[gotopos-1],zUp)
 
 def testGoZ():
    gotoz=int(gozentry.get())
@@ -208,35 +211,6 @@ motorslabel.grid(row=28,column=0, columnspan=7, sticky=W)
 motorsoffapply = Button(root, text="Motors OFF", command=MotorsOff)
 motorsoffapply.grid(row=29,column=6, columnspan=5, sticky=W)
 
-
-# chooseselector2label = Label(root, text="Select active gas stream")
-# chooseselector2label.grid(row=13,column=0, columnspan=7, sticky=W)
-# selector2chosen = IntVar()
-# selector2chosen.set(1)
-# chooseselector2menu = OptionMenu(root, selector2chosen, 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16)
-# chooseselector2menu.grid(row=13,column=4,columnspan=2,sticky=[W])
-# selector2apply = Button(root, text="Set port selector 1", command=setselector2)
-# selector2apply.grid(row=13,column=6, columnspan=5, sticky=W)
-
-# solenoid1 = IntVar()
-# solenoid1status = Checkbutton(root, text="Open solenoid 1", variable=solenoid1)
-# solenoid1status.grid(row=14,column=0, columnspan=5, sticky=W)
-# solenoid2 = IntVar()
-# solenoid2status = Checkbutton(root, text="Open solenoid 2", variable=solenoid2)
-# solenoid2status.grid(row=15,column=0, columnspan=5, sticky=W)
-# solenoid3 = IntVar()
-# solenoid3status = Checkbutton(root, text="Open solenoid 3", variable=solenoid3)
-# solenoid3status.grid(row=16,column=0, columnspan=5, sticky=W)
-# solenoid4 = IntVar()
-# solenoid4status = Checkbutton(root, text="Open solenoid 4", variable=solenoid4)
-# solenoid4status.grid(row=17,column=0, columnspan=5, sticky=W)
-# solenoid5 = IntVar()
-# solenoid5status = Checkbutton(root, text="Open solenoid 5", variable=solenoid5)
-# solenoid5status.grid(row=18,column=0, columnspan=5, sticky=W)
-
-# solenoidsapply = Button(root, text="Apply solenoid settings", command=setsolenoids)
-# solenoidsapply.grid(row=19,column=6, columnspan=5, sticky=W)
-
 f2=Frame(root,height=1,width=450,bg="grey")
 f2.grid(row=30,column=0, columnspan=10, pady=5)
 
@@ -247,8 +221,6 @@ errorlabel.grid(row=31,column=0, columnspan=10, sticky=[N,S,E,W])
 def tick():
    global timelastsolenoidrefresh
    clock.config(text=time.strftime('%H:%M:%S'))
-   # if (time.time()-timelastsolenoidrefresh>solenoidrefreshtime):
-     # refreshsolenoids()
    clock.after(200, tick)
     
 tick()

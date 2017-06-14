@@ -1,4 +1,4 @@
-include <OpenSampler_v4_config_v0p0.scad>;
+include <OpenSampler_v5_CONFIG_v0p0.scad>;
 $fn=32;
 
 
@@ -741,13 +741,12 @@ module spring_support_plate_top(){
 module spring_plate(){
     difference(){
         union(){
-            cylinder(r=7,h=12.7);
-            translate([0,0,6.35])
+            translate([0,0,0])
             scale([1,0.5,1])
             cylinder(r=20,h=6.35);
         }
         translate([0,0,-1])
-        cylinder(r1=1.6,r2=6,h=14.7); 
+        cylinder(r1=1.6,r2=6,h=8); 
         
         translate([-15,0,-1])
         cylinder(r=1.7,h=100); 
@@ -757,7 +756,7 @@ module spring_plate(){
     
 }
 
-module end_stop_holder(){
+module end_stop_holder_old(){
     difference(){
         translate([0,-7,0])
         cube([32,14,5]);
@@ -781,16 +780,39 @@ module end_stop_holder(){
     }
 }
 
+module end_stop_holder(){
+    difference(){
+        translate([0,-8,0])
+        rounded_cube(28,16,5,3);
+        
+        translate([6,-2,-1])
+        cylinder(r=2.55,h=10);
+        translate([6-2.55,-2,-1])
+        cube([5.1,4,10]);
+        translate([6,2,-1])
+        cylinder(r=2.55,h=10);       
+    
+        translate([23,-4.75,-1])
+        cylinder(r=1.7,h=10);    
+        translate([23,4.75,-1])
+        cylinder(r=1.7,h=10); 
+        
+        translate([23,-4.75,-1])
+        cylinder(r=2.8,h=4);    
+        translate([23,4.75,-1])
+        cylinder(r=2.8,h=4); 
+    }
+}
+
+
 module solenoid_plate(){
     difference(){
         union(){
             cylinder(r=8.5,h=4.8);
-            translate([-16,-5,0])
-            cube([32,10,4.8]);
         }
-        translate([-12.5,0,-1])
+        translate([0,-5,-1])
         cylinder(r=2.1,h=10);
-        translate([12.5,0,-1])
+        translate([0,5,-1])
         cylinder(r=2.1,h=10);        
         
         translate([3/16*in,0,-1])
@@ -805,12 +827,31 @@ module solenoid_plate(){
     }    
 }
 
+module rounded_cube(cx,cy,cz,cr){
+    union(){
+        translate([cr,0,0])
+        cube([cx-cr*2,cy,cz]);	
+        translate([0,cr,0])
+        cube([cx,cy-cr*2,cz]);
+        translate([cr,cr,0])
+        cylinder(r=cr,h=cz);
+        translate([cx-cr,cr,0])
+        cylinder(r=cr,h=cz);
+        translate([cr,cy-cr,0])
+        cylinder(r=cr,h=cz);
+        translate([cx-cr,cy-cr,0])
+        cylinder(r=cr,h=cz);
+    }   
+}
+
 //________________________________________________________________________________
 // --------------------individual parts----------------------------------------
 //
 //$fn=128;
 //projection(cut = true){
-    solenoid_plate();
+   // solenoid_plate();
+  //  end_stop_holder();
+
 //}
 //needle_mount_top();
 
@@ -842,13 +883,12 @@ module solenoid_plate(){
 //
 //translate([20,10,-10])
 //rotate([180,0,0])
-//spring_plate();
+spring_plate();
 //
 //translate([20,16,-1])
 //spring_support_plate_top();
 //}
 
-//end_stop_holder();
 
 // _________backpanel__________________
 //translate([0,40,0])

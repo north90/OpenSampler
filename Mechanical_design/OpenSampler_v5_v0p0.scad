@@ -1,5 +1,5 @@
-include <OpenSampler_v4_config_v0p0.scad>;
-use <OpenSampler_v4_PARTS_v0p1.scad>;
+include <OpenSampler_v5_CONFIG_v0p0.scad>;
+use <OpenSampler_v5_PARTS_v0p0.scad>;
 use <20150613_16mm_tube_tray_v0p0.scad>;
 
 
@@ -120,9 +120,9 @@ translate([7+320-320,0,0]){
         stepper();
     }
     
-    translate([xyarm+10,-69,zyarm-14])
+    translate([xyarm+10,-49,zyarm-10])
     rotate([0,90,0])
-    rotate([0,0,180])   
+    rotate([0,0,-90])   
     end_stop_holder();
     
     translate([0,-110-138+138,0]){

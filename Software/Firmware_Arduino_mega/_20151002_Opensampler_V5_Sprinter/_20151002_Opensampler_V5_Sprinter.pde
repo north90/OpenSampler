@@ -13,22 +13,19 @@
 //-------------------
 // G0  -> G1
 // G1  - Coordinated Movement X Y Z E
-// G4  - Dwell S<seconds> or P<milliseconds>
 // G28 - Home all Axis
 // G90 - Use Absolute Coordinates
 // G91 - Use Relative Coordinates
 // G92 - Set current position to cordinates given
 
-//RepRap M Codes
+//OpenSampler M Codes
 // M106 - Fan on
 // M107 - Fan off
 // M109 - Wait for extruder current temp to reach target temp.
 // M114 - Display current position
 
 //Custom M Codes
-// M80  - Turn on Power Supply
 // M42 - Set output on free pins, on a non pwm pin (over pin 13 on an arduino mega) use S255 to turn it on and S0 to turn it off. Use P to decide the pin (M42 P23 S255) would turn pin 23 on
-// M81  - Turn off Power Supply
 // M82  - Set E codes absolute (default)
 // M83  - Set E codes relative while in Absolute Coordinates (G90) mode
 // M84  - Disable steppers until next move, 
@@ -42,9 +39,7 @@
 // added code for OpenSampler
 long last_update_fan_pin=millis();
 
-
 //Stepper Movement Variables
-
 char axis_codes[NUM_AXIS] = {'X', 'Y', 'Z', 'E'};
 bool move_direction[NUM_AXIS];
 unsigned long axis_previous_micros[NUM_AXIS];

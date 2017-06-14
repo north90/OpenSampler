@@ -30,7 +30,7 @@ plateoffset=wheeloffset-10;
 // spacer block and acme block are 12mm thick.
 // 125ml (100ml) bottle size: h=95mm, diam=52mm
 
-// 60mm clearancy for needle and spings etc.
+// 60mm clearance for needle and spings etc.
 // so height between bottom frame and bottom z-axis:
 // trayplate thickness + bottle h + 60
 // 13 + 108 + 60 = 188mm

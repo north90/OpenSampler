@@ -8,9 +8,6 @@ long timeout_time_for_fan_pin=60;
 // X, Y, Z, E steps per unit - TR8-8mm per rotation, 200steps per rotation: 
 // 0.04mm per full step= 25 steps per mm
 // at 1/16 microsteps: 25*8=200 usteps per mm IN THEORY.. 
-//in practice the X-Axis TR8 aint quite 8
-// so 400mm turns out to be 403 (1% off!) So 198.5 steps per mm
-//float axis_steps_per_unit[] = {80, 80, 400, 200}; 
 float axis_steps_per_unit[] = {160, 160, 800, 200}; 
 
 //// Endstop Settings

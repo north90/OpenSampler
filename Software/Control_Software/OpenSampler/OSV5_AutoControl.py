@@ -27,18 +27,22 @@ class Settings():
     # time  (seconds to flush analyzer with lab Air after each sample) (90)
     postFlushSeconds=90
     # COMMUNICATION SETTINGS (look in Control Panel and look for Arduino Mega)
-    comPortOpenSampler=5
+    comPortOpenSampler=13
     # baudrate to OpenSampler (11500)
     baudRateOpenSampler=115200
     # amount sample positions 
     amountPositions=120
-    # X positions in mm
-    xmm=[26,45,64,83,102,26,45,64,83,102,26,45,64,83,102,26,45,64,83,102,26,45,64,83,102,26,45,64,83,102,26,45,64,83,102,26,45,64,83,102,135,154,173,192,211,135,154,173,192,211,135,154,173,192,211,135,154,173,192,211,135,154,173,192,211,135,154,173,192,211,135,154,173,192,211,135,154,173,192,211,244,263,282,301,320,244,263,282,301,320,244,263,282,301,320,244,263,282,301,320,244,263,282,301,320,244,263,282,301,320,244,263,282,301,320,244,263,282,301,320]
-    # Y positions in mm
-    ymm=[0.3,0.3,0.3,0.3,0.3,19.3,19.3,19.3,19.3,19.3,38.3,38.3,38.3,38.3,38.3,57.3,57.3,57.3,57.3,57.3,76.3,76.3,76.3,76.3,76.3,95.3,95.3,95.3,95.3,95.3,114.3,114.3,114.3,114.3,114.3,133.3,133.3,133.3,133.3,133.3,0.3,0.3,0.3,0.3,0.3,19.3,19.3,19.3,19.3,19.3,38.3,38.3,38.3,38.3,38.3,57.3,57.3,57.3,57.3,57.3,76.3,76.3,76.3,76.3,76.3,95.3,95.3,95.3,95.3,95.3,114.3,114.3,114.3,114.3,114.3,133.3,133.3,133.3,133.3,133.3,0.3,0.3,0.3,0.3,0.3,19.3,19.3,19.3,19.3,19.3,38.3,38.3,38.3,38.3,38.3,57.3,57.3,57.3,57.3,57.3,76.3,76.3,76.3,76.3,76.3,95.3,95.3,95.3,95.3,95.3,114.3,114.3,114.3,114.3,114.3,133.3,133.3,133.3,133.3,133.3]
-
+    # x position of first tube
+    xOffset=24.0
+    # y position of first tube
+    yOffset=0.5
+    # X positions in mm, measured from xhome+xoffset (=x position of first tube)
+    xmm=[0,19,38,57,76,0,19,38,57,76,0,19,38,57,76,0,19,38,57,76,0,19,38,57,76,0,19,38,57,76,0,19,38,57,76,0,19,38,57,76,109,128,147,166,185,109,128,147,166,185,109,128,147,166,185,109,128,147,166,185,109,128,147,166,185,109,128,147,166,185,109,128,147,166,185,109,128,147,166,185,218,237,256,275,294,218,237,256,275,294,218,237,256,275,294,218,237,256,275,294,218,237,256,275,294,218,237,256,275,294,218,237,256,275,294,218,237,256,275,294]
+    # Y positions in mm, measured from yhome+yoffset (=y position of first tube)
+    ymm=[0,0,0,0,0,19,19,19,19,19,38,38,38,38,38,57,57,57,57,57,76,76,76,76,76,95,95,95,95,95,114,114,114,114,114,133,133,133,133,133,0,0,0,0,0,19,19,19,19,19,38,38,38,38,38,57,57,57,57,57,76,76,76,76,76,95,95,95,95,95,114,114,114,114,114,133,133,133,133,133,0,0,0,0,0,19,19,19,19,19,38,38,38,38,38,57,57,57,57,57,76,76,76,76,76,95,95,95,95,95,114,114,114,114,114,133,133,133,133,133]
+    
     # down movement to get correct needle penetration
-    needleDepth=28;
+    needleDepth=33; #was 28 but needs deepeer for too tioght caps
     # how far to lift up needle for moves (0 is all the way up)
     zUp=0
     # how often to send commands to keep valves in current position (55)
@@ -235,7 +239,7 @@ def GoHome():
 def GoPosition(gotopos):
     if (gotopos > 0 and gotopos < Settings.amountPositions+1 ):
         GoZ(Settings.zUp)
-        GoXYZ(Settings.xmm[gotopos-1],Settings.ymm[gotopos-1],Settings.zUp)
+        GoXYZ(Settings.xOffset+Settings.xmm[gotopos-1],Settings.yOffset+Settings.ymm[gotopos-1],Settings.zUp)
       
 def GoXYZ(x,y,z):
     if not Automation.isHomed:
